@@ -49,10 +49,20 @@ sudo systemctl start confluent-zookeeper
 #sudo systemctl status confluent-server
 sudo systemctl start confluent-server
 
-#Control Center
+#Control Center#################################
 #sudo systemctl status confluent-control-center
 
 #change below configs
+
+Before starting Control Center, you must update the Kafka and Kafka Connect configuration files.
+Uncomment these lines in the Kafka server configuration file (<path-to-confluent>/etc/kafka/server.properties). This enables Confluent Metrics Reporter.
+
+metric.reporters=io.confluent.metrics.reporter.ConfluentMetricsReporter
+confluent.metrics.reporter.bootstrap.servers=localhost:9092
+#
+# Uncomment the following line if the metrics cluster has a single broker
+confluent.metrics.reporter.topic.replicas=1
+
 vi /etc/confluent-control-center/control-center.properties
 # Quick start partition and replication values
 confluent.controlcenter.internal.topics.partitions=1
