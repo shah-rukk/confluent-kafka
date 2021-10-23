@@ -1,0 +1,74 @@
+==========Confluent Kafka Installation============
+#https://docs.confluent.io/platform/current/installation/installing_cp/rhel-centos.html
+
+yum install java -y
+
+#create a file named confluent.repo with these contents. This adds the Confluent repositories.
+#1st way
+sudo su -c 'cat >> /etc/yum.repos.d/confluent.repo << EOL 
+[Confluent.dist]
+name=Confluent repository (dist)
+baseurl=https://packages.confluent.io/rpm/6.2/$releasever
+gpgcheck=1
+gpgkey=https://packages.confluent.io/rpm/6.2/archive.key
+enabled=1
+
+[Confluent]
+name=Confluent repository
+baseurl=https://packages.confluent.io/rpm/6.2
+gpgcheck=1
+gpgkey=https://packages.confluent.io/rpm/6.2/archive.key
+enabled=1
+EOL'
+
+$2nd way
+cat << EOF >> /etc/yum.repos.d/confluent.repo
+[Confluent.dist]
+name=Confluent repository (dist)
+baseurl=https://packages.confluent.io/rpm/6.2/$releasever
+gpgcheck=1
+gpgkey=https://packages.confluent.io/rpm/6.2/archive.key
+enabled=1
+
+[Confluent]
+name=Confluent repository
+baseurl=https://packages.confluent.io/rpm/6.2
+gpgcheck=1
+gpgkey=https://packages.confluent.io/rpm/6.2/archive.key
+enabled=1
+EOF
+
+#Clear the YUM caches and install Confluent Platform.
+sudo yum clean all && sudo yum install confluent-platform -y
+
+#start zookeeper
+#sudo systemctl status confluent-zookeeper
+sudo systemctl start confluent-zookeeper
+
+#start kafka
+#sudo systemctl status confluent-server
+sudo systemctl start confluent-server
+
+#Control Center
+#sudo systemctl status confluent-control-center
+
+#change below configs
+vi /etc/confluent-control-center/control-center.properties
+# Quick start partition and replication values
+confluent.controlcenter.internal.topics.partitions=1
+confluent.controlcenter.internal.topics.replication=1
+confluent.controlcenter.command.topic.replication=1
+confluent.monitoring.interceptor.topic.partitions=1
+confluent.monitoring.interceptor.topic.replication=1
+confluent.metrics.topic.partitions=1
+confluent.metrics.topic.replication=1
+
+
+/usr/bin/control-center-start /etc/confluent-control-center/control-center.properties
+
+/usr/bin/control-center-start -daemon /etc/confluent-control-center/control-center.properties
+
+
+now you can access control center on port 9021
+
+
